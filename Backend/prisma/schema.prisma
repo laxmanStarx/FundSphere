@@ -47,7 +47,7 @@ model User {
 
 enum Currency {
   INR
-  USD
+  
   
 }
 
@@ -55,11 +55,23 @@ model Wallet {
   id         String    @id @default(uuid()) @db.Uuid
   userId     String    @unique @db.Uuid
   balance    Decimal   @default(0.00) @db.Decimal(12,2)
-  currency   Currency[]  @default([INR,USD])
+  currency   Currency  @default(INR)
 
 
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Category {
+  id        String @id @default(uuid()) @db.Uuid
+  name      String  @unique
+  description String?
+  icon         String?
+
+
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
