@@ -34,64 +34,49 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  wallet  Wallet?
+  wallet Wallet?
 
   campaigns Campaign[]
 
-  donations  Donation[]
+  notifications Notification[]
+
+  donations Donation[]
+
+  refreshTokens RefreshToken[]
 
   @@index([role])
   @@index([createdAt])
 }
 
-
-
-
-
-
 enum Currency {
   INR
-  
-  
 }
 
 model Wallet {
-  id         String    @id @default(uuid()) @db.Uuid
-  userId     String    @unique @db.Uuid
-  balance    Decimal   @default(0.00) @db.Decimal(12,2)
-  currency   Currency  @default(INR)
+  id       String   @id @default(uuid()) @db.Uuid
+  userId   String   @unique @db.Uuid
+  balance  Decimal  @default(0.00) @db.Decimal(12, 2)
+  currency Currency @default(INR)
 
-
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   transactions WalletTransaction[]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-
 model Category {
-  id        String @id @default(uuid()) @db.Uuid
-  name      String  @unique
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
   description String?
-  icon         String?
-
+  icon        String?
 
   createdAt DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
-  campaigns    Campaign[]
+  campaigns Campaign[]
 }
-
-
-
-
-
-
-
-
-
 
 enum CampaignStatus {
   DRAFT
@@ -102,70 +87,59 @@ enum CampaignStatus {
 }
 
 model Campaign {
-  id            String          @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
-  ownerId       String          @db.Uuid
-  categoryId    String          @db.Uuid
+  ownerId    String @db.Uuid
+  categoryId String @db.Uuid
 
-  title         String
-  description   String
+  title       String
+  description String
 
-  goalAmount    Decimal         @db.Decimal(12,2)
-  raisedAmount  Decimal         @default(0.00) @db.Decimal(12,2)
+  goalAmount   Decimal @db.Decimal(12, 2)
+  raisedAmount Decimal @default(0.00) @db.Decimal(12, 2)
 
-  imageUrl      String?
+  imageUrl String?
 
-  status        CampaignStatus  @default(DRAFT)
+  status CampaignStatus @default(DRAFT)
 
-  deadline      DateTime
+  deadline DateTime
 
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  owner         User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  category      Category        @relation(fields: [categoryId], references: [id])
+  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+
+  donations Donation[]
 
   @@index([ownerId])
   @@index([categoryId])
   @@index([status])
-
-
-  donations   Donation[]
 }
 
-
-
-
-
-
-
-
-
 model Donation {
-  id           String    @id @default(uuid()) @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
-  donorId      String    @db.Uuid
-  campaignId   String    @db.Uuid
+  donorId    String @db.Uuid
+  campaignId String @db.Uuid
 
-  amount       Decimal   @db.Decimal(12,2)
+  amount Decimal @db.Decimal(12, 2)
 
-  anonymous    Boolean   @default(false)
+  anonymous Boolean @default(false)
 
-  message      String?
+  message String?
 
-  createdAt    DateTime  @default(now())
+  createdAt DateTime @default(now())
 
-  donor         User      @relation(fields: [donorId], references: [id])
-  campaign      Campaign  @relation(fields: [campaignId], references: [id])
+  donor    User     @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  transaction WalletTransaction?
 
   @@index([donorId])
   @@index([campaignId])
   @@index([createdAt])
-
-
-  transaction WalletTransaction?
 }
-
 
 enum TransactionType {
   CREDIT
@@ -184,32 +158,84 @@ enum PaymentGateway {
 }
 
 model WalletTransaction {
+  id String @id @default(uuid()) @db.Uuid
 
-  id                String              @id @default(uuid()) @db.Uuid
+  walletId   String  @db.Uuid
+  donationId String? @unique @db.Uuid
 
-  walletId          String              @db.Uuid
-  donationId        String?             @db.Uuid
+  type TransactionType
 
-  type              TransactionType
+  amount Decimal @db.Decimal(12, 2)
 
-  amount            Decimal             @db.Decimal(12,2)
+  status TransactionStatus @default(PENDING)
 
-  status            TransactionStatus   @default(PENDING)
+  gateway PaymentGateway?
 
-  gateway           PaymentGateway?
+  gatewayReference String?
 
-  gatewayReference  String?
+  description String?
 
-  description       String?
+  createdAt DateTime @default(now())
 
-  createdAt         DateTime            @default(now())
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
-  wallet            Wallet              @relation(fields: [walletId], references: [id], onDelete: Cascade)
-
-  donation          Donation?           @relation(fields: [donationId], references: [id])
+  donation Donation? @relation(fields: [donationId], references: [id])
 
   @@index([walletId])
   @@index([donationId])
   @@index([status])
   @@index([createdAt])
+}
+
+enum NotificationType {
+  DONATION_RECEIVED
+  CAMPAIGN_APPROVED
+  CAMPAIGN_REJECTED
+  CAMPAIGN_COMPLETED
+  CAMPAIGN_EXPIRED
+  WITHDRAWAL_SUCCESS
+  SYSTEM
+}
+
+model Notification {
+  id String @id @default(uuid()) @db.Uuid
+
+  userId String @db.Uuid
+
+  type NotificationType
+
+  title String
+
+  message String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model RefreshToken {
+  id String @id @default(uuid()) @db.Uuid
+
+  token String @unique
+
+  userId String @db.Uuid
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
