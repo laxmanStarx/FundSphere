@@ -1,4 +1,4 @@
-import {prisma } from "../config/prisma"
+import  prisma  from "../config/prisma"
 
 
 export class AuthRepository {
@@ -20,6 +20,50 @@ export class AuthRepository {
     }) {
         return prisma.user.create({
             data,
+        })
+    }
+
+
+    async findUserById(id: string)
+    {
+        return prisma.user.findUnique({
+            where: {id},
+        });
+    }
+
+    async createWallet(userId: string){
+        return prisma.wallet.create({
+            data: {
+                userId,
+            },
+        });
+    }
+
+    async saveRefreshToken(
+        token: string,
+        userId: string,
+        expiresAt: Date
+    ){
+        return prisma.refreshToken.create({
+            data:
+            {
+                token,
+                userId,
+                expiresAt,
+            }
+        });
+    }
+
+    async updateLastLogin(userId: string)
+    {
+        return prisma.user.update({
+            where: 
+            {
+                id: userId,
+            },
+            data: {
+                lastLoginAt: new Date(),
+            },
         })
     }
 
