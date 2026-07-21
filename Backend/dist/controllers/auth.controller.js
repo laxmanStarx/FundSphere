@@ -23,6 +23,23 @@ class AuthController {
             data: result,
         });
     }
+    async logout(req, res) {
+        const { refreshToken } = req.body;
+        await this.authService.logout(refreshToken);
+        return res.status(httpStatus_1.HttpStatus.OK).json({
+            success: true,
+            message: "Logout successful",
+        });
+    }
+    async refresh(req, res) {
+        const { refreshToken } = req.body;
+        const result = await this.authService.refresh(refreshToken);
+        return res.status(httpStatus_1.HttpStatus.OK).json({
+            success: true,
+            message: "Access token refreshed successfully",
+            data: result,
+        });
+    }
     async me(req, res) {
         const user = await this.authService.me(req.user.id);
         return res.status(httpStatus_1.HttpStatus.OK).json({

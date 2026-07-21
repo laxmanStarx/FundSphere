@@ -3,6 +3,8 @@ import { AuthRepository } from "../repositories/auth.repository";
 
 import { AppError } from "../utils/AppError";
 
+import { JwtPayload } from "../interfaces/jwt-payload.interface";
+
 import {
   comparePassword,
   hashPassword,
@@ -11,6 +13,7 @@ import {
 import {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } from "../utils/jwt";
 
 export class AuthService {
@@ -98,6 +101,50 @@ export class AuthService {
     };
   }
 
+
+
+async refresh(refreshToken: string) {
+  const decoded = verifyRefreshToken(refreshToken) as JwtPayload;
+
+  const storedToken =
+    await this.authRepository.findRefreshToken(refreshToken);
+
+  if (!storedToken) {
+    throw new AppError(
+      "Invalid refresh token",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
+
+  const user = await this.authRepository.findUserById(
+    decoded.userId
+  );
+
+  if (!user) {
+    throw new AppError(
+      "User not found",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
+
+  const accessToken = generateAccessToken(user.id);
+
+  return {
+    accessToken,
+  };
+}
+
+
+
+
+
+
+
+
+
+
+  
+
   async me(userId: string) {
     const user = await this.authRepository.findUserById(userId);
 
@@ -112,4 +159,25 @@ export class AuthService {
 
     return safeUser;
   }
+
+
+  async logout(refreshToken: string) {
+  const storedToken =
+    await this.authRepository.findRefreshToken(refreshToken);
+
+  if (!storedToken) {
+    throw new AppError(
+      "Invalid refresh token",
+      HttpStatus.UNAUTHORIZED
+    );
+  }
+
+  await this.authRepository.deleteRefreshToken(refreshToken);
+
+  return;
+}
+
+
+
+
 }

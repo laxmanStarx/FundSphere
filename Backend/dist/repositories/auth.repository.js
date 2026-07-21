@@ -13,6 +13,13 @@ class AuthRepository {
             },
         });
     }
+    async findRefreshToken(token) {
+        return prisma_1.default.refreshToken.findUnique({
+            where: {
+                token,
+            },
+        });
+    }
     async createUser(data) {
         return prisma_1.default.user.create({
             data,
@@ -46,6 +53,13 @@ class AuthRepository {
             },
             data: {
                 lastLoginAt: new Date(),
+            },
+        });
+    }
+    async deleteRefreshToken(token) {
+        return prisma_1.default.refreshToken.delete({
+            where: {
+                token,
             },
         });
     }

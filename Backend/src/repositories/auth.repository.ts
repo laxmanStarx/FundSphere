@@ -13,6 +13,16 @@ export class AuthRepository {
     }
 
 
+
+    async findRefreshToken(token: string) {
+  return prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+  });
+}
+
+
     async createUser(data: {
         name: string;
         email: string;
@@ -66,6 +76,18 @@ export class AuthRepository {
             },
         })
     }
+
+    async deleteRefreshToken(token: string) {
+  return prisma.refreshToken.delete({
+    where: {
+      token,
+    },
+  });
+}
+
+
+
+
 
 
 }

@@ -29,6 +29,30 @@ export class AuthController {
     });
   }
 
+
+  async logout(req: Request, res: Response) {
+  const { refreshToken } = req.body;
+
+  await this.authService.logout(refreshToken);
+
+  return res.status(HttpStatus.OK).json({
+    success: true,
+    message: "Logout successful",
+  });
+}
+
+  async refresh(req: Request, res: Response) {
+  const { refreshToken } = req.body;
+
+  const result = await this.authService.refresh(refreshToken);
+
+  return res.status(HttpStatus.OK).json({
+    success: true,
+    message: "Access token refreshed successfully",
+    data: result,
+  });
+}
+
   async me(req: Request, res: Response) {
   const user = await this.authService.me(req.user!.id);
 

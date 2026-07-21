@@ -48,6 +48,21 @@ class AuthService {
             refreshToken,
         };
     }
+    async refresh(refreshToken) {
+        const decoded = (0, jwt_1.verifyRefreshToken)(refreshToken);
+        const storedToken = await this.authRepository.findRefreshToken(refreshToken);
+        if (!storedToken) {
+            throw new AppError_1.AppError("Invalid refresh token", httpStatus_1.HttpStatus.UNAUTHORIZED);
+        }
+        const user = await this.authRepository.findUserById(decoded.userId);
+        if (!user) {
+            throw new AppError_1.AppError("User not found", httpStatus_1.HttpStatus.UNAUTHORIZED);
+        }
+        const accessToken = (0, jwt_1.generateAccessToken)(user.id);
+        return {
+            accessToken,
+        };
+    }
     async me(userId) {
         const user = await this.authRepository.findUserById(userId);
         if (!user) {
@@ -55,6 +70,14 @@ class AuthService {
         }
         const { password, ...safeUser } = user;
         return safeUser;
+    }
+    async logout(refreshToken) {
+        const storedToken = await this.authRepository.findRefreshToken(refreshToken);
+        if (!storedToken) {
+            throw new AppError_1.AppError("Invalid refresh token", httpStatus_1.HttpStatus.UNAUTHORIZED);
+        }
+        await this.authRepository.deleteRefreshToken(refreshToken);
+        return;
     }
 }
 exports.AuthService = AuthService;
