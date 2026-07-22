@@ -36,13 +36,15 @@ model User {
 
   wallet Wallet?
 
-  campaigns Campaign[]
+  campaigns Campaign[] @relation("CampaignOwner")
 
   notifications Notification[]
 
   donations Donation[]
 
   refreshTokens RefreshToken[]
+
+  approvedCampaigns Campaign[] @relation("CampaignApprovedBy")
 
   @@index([role])
   @@index([createdAt])
@@ -79,8 +81,9 @@ model Category {
 }
 
 enum CampaignStatus {
-  DRAFT
+  PENDING
   ACTIVE
+  REJECTED
   COMPLETED
   EXPIRED
   CANCELLED
@@ -98,23 +101,55 @@ model Campaign {
   goalAmount   Decimal @db.Decimal(12, 2)
   raisedAmount Decimal @default(0.00) @db.Decimal(12, 2)
 
-  imageUrl String?
+  isFeatured Boolean @default(false)
 
-  status CampaignStatus @default(DRAFT)
+  status CampaignStatus @default(PENDING)
 
   deadline DateTime
+
+  rejectionReason String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner    User     @relation("CampaignOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   category Category @relation(fields: [categoryId], references: [id])
 
   donations Donation[]
 
-  @@index([ownerId])
-  @@index([categoryId])
+  approvedAt DateTime?
+
+  slug String @unique
+
+  approvedById String? @db.Uuid
+
+  approvedBy User? @relation("CampaignApprovedBy", fields: [approvedById], references: [id])
+
+  deletedAt DateTime?
+
+  images CampaignImage[]
+
+  @@index([deadline])
+  @@index([ownerId, status])
+  @@index([categoryId, status])
   @@index([status])
+  @@index([isFeatured])
+}
+
+model CampaignImage {
+  id         String @id @default(uuid()) @db.Uuid
+  campaignId String @db.Uuid
+
+  url      String
+  publicId String
+
+  createdAt DateTime @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
 }
 
 model Donation {
@@ -135,6 +170,8 @@ model Donation {
   campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   transaction WalletTransaction?
+
+  updatedAt DateTime @updatedAt
 
   @@index([donorId])
   @@index([campaignId])
@@ -239,6 +276,3 @@ model RefreshToken {
   @@index([userId])
   @@index([expiresAt])
 }
-
-
-
