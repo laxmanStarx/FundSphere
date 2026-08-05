@@ -4,6 +4,11 @@ import authRoutes from "./routes/auth.routes";
 
 import { errorMiddleware } from "./middlewares/error.middleware";
 
+
+import campaignRoutes from "./routes/campaign.routes";
+
+
+
 const app = express();
 
 app.use(express.json());
@@ -15,6 +20,8 @@ app.get("/", (req, res) => {
 
 
 app.use("/api/v1/auth", authRoutes)
+
+app.use("/api/v1/campaigns", campaignRoutes);
 
 
 

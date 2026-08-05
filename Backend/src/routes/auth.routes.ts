@@ -7,7 +7,7 @@ import {
   loginValidator,
 } from "../validators/auth.validator";
 
-import { validate } from "../middlewares/validation.middleware";
+import { validateRequest } from "../middlewares/validation.middleware";
 import { authenticate } from "../middlewares/auth.middleware";
 
 const router = Router();
@@ -17,14 +17,14 @@ const authController = new AuthController();
 router.post(
   "/register",
   registerValidator,
-  validate,
+  validateRequest,
   authController.register.bind(authController)
 );
 
 router.post(
   "/login",
   loginValidator,
-  validate,
+  validateRequest,
   authController.login.bind(authController)
 );
 

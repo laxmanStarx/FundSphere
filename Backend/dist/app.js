@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const error_middleware_1 = require("./middlewares/error.middleware");
+const campaign_routes_1 = __importDefault(require("./routes/campaign.routes"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.get("/", (req, res) => {
     res.send("FundSphere Backend Running");
 });
 app.use("/api/v1/auth", auth_routes_1.default);
+app.use("/api/v1/campaigns", campaign_routes_1.default);
 app.use(error_middleware_1.errorMiddleware);
 exports.default = app;
