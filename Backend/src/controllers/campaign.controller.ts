@@ -144,4 +144,40 @@ rejectCampaign = asyncHandler(
 );
 
 
+updateCampaign = asyncHandler(
+  async (req: Request, res: Response) => {
+
+    const campaignId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const campaign =
+      await this.campaignService.updateCampaign(
+        campaignId,
+        req.user!.id,
+        {
+          title: req.body.title,
+          description: req.body.description,
+          goalAmount:
+            req.body.goalAmount !== undefined
+              ? Number(req.body.goalAmount)
+              : undefined,
+          categoryId: req.body.categoryId,
+          deadline: req.body.deadline
+            ? new Date(req.body.deadline)
+            : undefined,
+        }
+      );
+
+    return res.status(HttpStatus.OK).json(
+      new ApiResponse(
+        HttpStatus.OK,
+        campaign,
+        "Campaign updated successfully"
+      )
+    );
+  }
+);
+
+
 }

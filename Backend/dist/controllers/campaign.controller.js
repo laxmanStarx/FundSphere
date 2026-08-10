@@ -62,6 +62,23 @@ class CampaignController {
             const campaign = await this.campaignService.rejectCampaign(campaignId, req.user.id, req.body.rejectionReason);
             return res.status(httpStatus_1.HttpStatus.OK).json(new apiResponse_1.ApiResponse(httpStatus_1.HttpStatus.OK, campaign, "Campaign rejected successfully"));
         });
+        this.updateCampaign = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+            const campaignId = Array.isArray(req.params.id)
+                ? req.params.id[0]
+                : req.params.id;
+            const campaign = await this.campaignService.updateCampaign(campaignId, req.user.id, {
+                title: req.body.title,
+                description: req.body.description,
+                goalAmount: req.body.goalAmount !== undefined
+                    ? Number(req.body.goalAmount)
+                    : undefined,
+                categoryId: req.body.categoryId,
+                deadline: req.body.deadline
+                    ? new Date(req.body.deadline)
+                    : undefined,
+            });
+            return res.status(httpStatus_1.HttpStatus.OK).json(new apiResponse_1.ApiResponse(httpStatus_1.HttpStatus.OK, campaign, "Campaign updated successfully"));
+        });
     }
 }
 exports.CampaignController = CampaignController;

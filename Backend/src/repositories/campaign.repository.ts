@@ -253,4 +253,28 @@ async rejectCampaign(
     },
   });
 }
+
+
+async updateCampaign(
+  id: string,
+  data: Prisma.CampaignUpdateInput
+) {
+  return prisma.campaign.update({
+    where: {
+      id,
+    },
+    data,
+    include: {
+      owner: true,
+      category: true,
+      images: true,
+    },
+  });
+}
+
+
+
+
+
+
 }

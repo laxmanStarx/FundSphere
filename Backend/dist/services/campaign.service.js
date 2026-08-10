@@ -114,5 +114,68 @@ class CampaignService {
         const rejectedCampaign = await this.campaignRepository.rejectCampaign(campaignId, adminId, rejectionReason);
         return rejectedCampaign;
     }
+    async updateCampaign(campaignId, userId, data) {
+        const campaign = await this.campaignRepository.findCampaignById(campaignId);
+        if (!campaign) {
+            throw new AppError_1.AppError("Campaign not found", httpStatus_1.HttpStatus.NOT_FOUND);
+        }
+        if (campaign.ownerId !== userId) {
+            throw new AppError_1.AppError("You are not allowed to update this campaign", httpStatus_1.HttpStatus.FORBIDDEN);
+        }
+        if (campaign.status !== "PENDING") {
+            throw new AppError_1.AppError("Only pending campaigns can be updated", httpStatus_1.HttpStatus.BAD_REQUEST);
+        }
+        if (data.deadline && data.deadline <= new Date()) {
+            throw new AppError_1.AppError("Deadline must be in the future", httpStatus_1.HttpStatus.BAD_REQUEST);
+        }
+        if (data.goalAmount !== undefined && data.goalAmount <= 0) {
+            throw new AppError_1.AppError("Goal amount must be greater than zero", httpStatus_1.HttpStatus.BAD_REQUEST);
+        }
+        if (data.categoryId) {
+            const category = await this.campaignRepository.findCategoryById(data.categoryId);
+            if (!category) {
+                throw new AppError_1.AppError("Category not found", httpStatus_1.HttpStatus.NOT_FOUND);
+            }
+        }
+        let slug;
+        if (data.title) {
+            const baseSlug = (0, slug_1.generateSlug)(data.title);
+            slug = baseSlug;
+            let counter = 1;
+            let existingCampaign = await this.campaignRepository.findCampaignBySlug(slug);
+            while (existingCampaign &&
+                existingCampaign.id !== campaignId) {
+                slug = `${baseSlug}-${counter}`;
+                existingCampaign =
+                    await this.campaignRepository.findCampaignBySlug(slug);
+                counter++;
+            }
+        }
+        const updatedCampaign = await this.campaignRepository.updateCampaign(campaignId, {
+            ...(data.title && {
+                title: data.title,
+            }),
+            ...(data.description && {
+                description: data.description,
+            }),
+            ...(data.goalAmount !== undefined && {
+                goalAmount: data.goalAmount,
+            }),
+            ...(data.deadline && {
+                deadline: data.deadline,
+            }),
+            ...(data.categoryId && {
+                category: {
+                    connect: {
+                        id: data.categoryId,
+                    },
+                },
+            }),
+            ...(slug && {
+                slug,
+            }),
+        });
+        return updatedCampaign;
+    }
 }
 exports.CampaignService = CampaignService;

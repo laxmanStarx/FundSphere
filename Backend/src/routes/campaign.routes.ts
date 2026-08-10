@@ -51,4 +51,7 @@ router.patch(
   campaignController.rejectCampaign
 );
 
+
+router.patch("/:id",authenticate,campaignController.updateCampaign);
+
 export default router;

@@ -217,4 +217,138 @@ async rejectCampaign(
 
   return rejectedCampaign;
 }
+
+
+async updateCampaign(
+  campaignId: string,
+  userId: string,
+  data: {
+    title?: string;
+    description?: string;
+    goalAmount?: number;
+    categoryId?: string;
+    deadline?: Date;
+  }
+) {
+  const campaign =
+    await this.campaignRepository.findCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new AppError(
+      "Campaign not found",
+      HttpStatus.NOT_FOUND
+    );
+  }
+
+  if (campaign.ownerId !== userId) {
+    throw new AppError(
+      "You are not allowed to update this campaign",
+      HttpStatus.FORBIDDEN
+    );
+  }
+
+  if (campaign.status !== "PENDING") {
+    throw new AppError(
+      "Only pending campaigns can be updated",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  if (data.deadline && data.deadline <= new Date()) {
+    throw new AppError(
+      "Deadline must be in the future",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  if (data.goalAmount !== undefined && data.goalAmount <= 0) {
+    throw new AppError(
+      "Goal amount must be greater than zero",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  if (data.categoryId) {
+    const category =
+      await this.campaignRepository.findCategoryById(
+        data.categoryId
+      );
+
+    if (!category) {
+      throw new AppError(
+        "Category not found",
+        HttpStatus.NOT_FOUND
+      );
+    }
+  }
+
+  let slug: string | undefined;
+
+  if (data.title) {
+    const baseSlug = generateSlug(data.title);
+
+    slug = baseSlug;
+
+    let counter = 1;
+
+    let existingCampaign =
+      await this.campaignRepository.findCampaignBySlug(slug);
+
+    while (
+      existingCampaign &&
+      existingCampaign.id !== campaignId
+    ) {
+      slug = `${baseSlug}-${counter}`;
+
+      existingCampaign =
+        await this.campaignRepository.findCampaignBySlug(
+          slug
+        );
+
+      counter++;
+    }
+  }
+
+  const updatedCampaign =
+    await this.campaignRepository.updateCampaign(
+      campaignId,
+      {
+        ...(data.title && {
+          title: data.title,
+        }),
+
+        ...(data.description && {
+          description: data.description,
+        }),
+
+        ...(data.goalAmount !== undefined && {
+          goalAmount: data.goalAmount,
+        }),
+
+        ...(data.deadline && {
+          deadline: data.deadline,
+        }),
+
+        ...(data.categoryId && {
+          category: {
+            connect: {
+              id: data.categoryId,
+            },
+          },
+        }),
+
+        ...(slug && {
+          slug,
+        }),
+      }
+    );
+
+  return updatedCampaign;
+}
+
+
+
+
+
+
 }

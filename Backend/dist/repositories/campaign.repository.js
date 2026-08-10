@@ -215,5 +215,18 @@ class CampaignRepository {
             },
         });
     }
+    async updateCampaign(id, data) {
+        return prisma_1.default.campaign.update({
+            where: {
+                id,
+            },
+            data,
+            include: {
+                owner: true,
+                category: true,
+                images: true,
+            },
+        });
+    }
 }
 exports.CampaignRepository = CampaignRepository;

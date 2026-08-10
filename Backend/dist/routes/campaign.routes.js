@@ -16,4 +16,5 @@ router.get("/", campaignController.getAllCampaigns);
 router.get("/:slug", campaignController.getCampaignBySlug);
 router.patch("/:id/approve", auth_middleware_1.authenticate, (0, autorize_middleware_1.authorize)("ADMIN"), campaignController.approveCampaign);
 router.patch("/:id/reject", auth_middleware_1.authenticate, (0, autorize_middleware_1.authorize)("ADMIN"), campaignController.rejectCampaign);
+router.patch("/:id", auth_middleware_1.authenticate, campaignController.updateCampaign);
 exports.default = router;
