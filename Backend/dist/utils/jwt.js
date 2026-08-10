@@ -5,7 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyRefreshToken = exports.verifyAccessToken = exports.generateRefreshToken = exports.generateAccessToken = void 0;
+exports.generateAccessToken = generateAccessToken;
+exports.generateRefreshToken = generateRefreshToken;
+exports.verifyAccessToken = verifyAccessToken;
+exports.verifyRefreshToken = verifyRefreshToken;
 // export interface JwtPayload {
 //   userId: string;
 //   role: Role;
@@ -37,18 +40,14 @@ function generateAccessToken(userId) {
         expiresIn: "15m",
     });
 }
-exports.generateAccessToken = generateAccessToken;
 function generateRefreshToken(userId) {
     return jsonwebtoken_1.default.sign({ userId }, env_1.env.JWT_REFRESH_SECRET, {
         expiresIn: "7d",
     });
 }
-exports.generateRefreshToken = generateRefreshToken;
 function verifyAccessToken(token) {
     return jsonwebtoken_1.default.verify(token, env_1.env.JWT_ACCESS_SECRET);
 }
-exports.verifyAccessToken = verifyAccessToken;
 function verifyRefreshToken(token) {
     return jsonwebtoken_1.default.verify(token, env_1.env.JWT_REFRESH_SECRET);
 }
-exports.verifyRefreshToken = verifyRefreshToken;

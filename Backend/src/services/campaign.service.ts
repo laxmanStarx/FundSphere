@@ -9,9 +9,7 @@ export class CampaignService {
     private campaignRepository = new CampaignRepository()
   ) {}
 
-  // =========================
-  // CREATE CAMPAIGN
-  // =========================
+ 
   async createCampaign(
     userId: string,
     data: {
@@ -84,13 +82,50 @@ export class CampaignService {
   }
 
 
-  async getAllCampaigns() {
-    return this.campaignRepository.findAllCampaigns();
-  }
+async getAllCampaigns(params: {
+  page?: number;
+  limit?: number;
+  categoryId?: string;
+  search?: string;
+  isFeatured?: boolean;
+}) {
+  const page = params.page && params.page > 0
+    ? params.page
+    : 1;
 
-  // =========================
-  // GET CAMPAIGN BY SLUG
-  // =========================
+  const limit = params.limit && params.limit > 0
+    ? Math.min(params.limit, 50)
+    : 10;
+
+  const skip = (page - 1) * limit;
+
+  const [campaigns, total] = await Promise.all([
+    this.campaignRepository.findAllCampaigns({
+      skip,
+      take: limit,
+      categoryId: params.categoryId,
+      search: params.search,
+      isFeatured: params.isFeatured,
+    }),
+
+    this.campaignRepository.countCampaigns({
+      categoryId: params.categoryId,
+      search: params.search,
+      isFeatured: params.isFeatured,
+    }),
+  ]);
+
+  return {
+    campaigns,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
+
   async getCampaignBySlug(slug: string) {
     const campaign =
       await this.campaignRepository.findCampaignDetailsBySlug(
@@ -106,4 +141,80 @@ export class CampaignService {
 
     return campaign;
   }
+
+  async approveCampaign(
+  campaignId: string,
+  adminId: string
+) {
+  const campaign =
+    await this.campaignRepository.findCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new AppError(
+      "Campaign not found",
+      HttpStatus.NOT_FOUND
+    );
+  }
+
+  if (campaign.status !== "PENDING") {
+    throw new AppError(
+      "Only pending campaigns can be approved",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  if (campaign.deadline <= new Date()) {
+    throw new AppError(
+      "Campaign deadline has already passed",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  const approvedCampaign =
+    await this.campaignRepository.approveCampaign(
+      campaignId,
+      adminId
+    );
+
+  return approvedCampaign;
+}
+
+async rejectCampaign(
+  campaignId: string,
+  adminId: string,
+  rejectionReason: string
+) {
+  const campaign =
+    await this.campaignRepository.findCampaignById(campaignId);
+
+  if (!campaign) {
+    throw new AppError(
+      "Campaign not found",
+      HttpStatus.NOT_FOUND
+    );
+  }
+
+  if (campaign.status !== "PENDING") {
+    throw new AppError(
+      "Only pending campaigns can be rejected",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  if (!rejectionReason.trim()) {
+    throw new AppError(
+      "Rejection reason is required",
+      HttpStatus.BAD_REQUEST
+    );
+  }
+
+  const rejectedCampaign =
+    await this.campaignRepository.rejectCampaign(
+      campaignId,
+      adminId,
+      rejectionReason
+    );
+
+  return rejectedCampaign;
+}
 }

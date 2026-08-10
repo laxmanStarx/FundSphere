@@ -1,13 +1,54 @@
 import { Router } from "express";
+
 import { CampaignController } from "../controllers/campaign.controller";
+
 import { authenticate } from "../middlewares/auth.middleware";
+import {  validateRequest } from "../middlewares/validation.middleware";
+
 import { createCampaignValidator } from "../validators/campaign.validator";
-import { validateRequest } from "../middlewares/validation.middleware";
+import { authorize } from "../middlewares/autorize.middleware";
 
 const router = Router();
 
 const campaignController = new CampaignController();
 
-router.post( "/",authenticate,createCampaignValidator,validateRequest,campaignController.createCampaign);
+
+// CREATE CAMPAIGN
+router.post(
+  "/",
+  authenticate,
+  createCampaignValidator,
+  validateRequest,
+  campaignController.createCampaign
+);
+
+
+// GET ALL ACTIVE CAMPAIGNS
+router.get(
+  "/",
+  campaignController.getAllCampaigns
+);
+
+
+// GET CAMPAIGN BY SLUG
+router.get(
+  "/:slug",
+  campaignController.getCampaignBySlug
+);
+
+
+router.patch(
+  "/:id/approve",
+  authenticate,
+  authorize("ADMIN"),
+  campaignController.approveCampaign
+);
+
+router.patch(
+  "/:id/reject",
+  authenticate,
+  authorize("ADMIN"),
+  campaignController.rejectCampaign
+);
 
 export default router;

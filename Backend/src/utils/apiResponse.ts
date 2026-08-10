@@ -4,14 +4,14 @@ export class ApiResponse<T> {
   message: string;
   data?: T;
 
-  constructor(
-    statusCode: number,
-    data: T,
-    message = "Success"
-  ) {
+  constructor(statusCode: number,data: T,message = "Success") {
+
+
     this.statusCode = statusCode;
     this.success = statusCode < 400;
     this.message = message;
     this.data = data;
   }
+
+  
 }
