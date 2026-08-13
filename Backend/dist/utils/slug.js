@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateSlug = generateSlug;
+exports.generateSlug = void 0;
 function generateSlug(title) {
     return title
         .toLowerCase()
@@ -9,3 +9,4 @@ function generateSlug(title) {
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
 }
+exports.generateSlug = generateSlug;

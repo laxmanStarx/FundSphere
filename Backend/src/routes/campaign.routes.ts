@@ -10,6 +10,8 @@ import { authorize } from "../middlewares/autorize.middleware";
 
 const router = Router();
 
+import { Role } from "@prisma/client";
+
 const campaignController = new CampaignController();
 
 
@@ -50,6 +52,22 @@ router.patch(
   authorize("ADMIN"),
   campaignController.rejectCampaign
 );
+
+
+
+router.put(
+  "/:id",
+  authenticate,
+  campaignController.updateCampaign
+);
+
+
+
+
+
+
+
+
 
 
 router.patch("/:id",authenticate,campaignController.updateCampaign);

@@ -53,4 +53,21 @@ router.get(
   authController.me.bind(authController)
 );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export default router;

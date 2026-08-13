@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CampaignRepository = void 0;
 const prisma_1 = __importDefault(require("../config/prisma"));
 class CampaignRepository {
+    // Create campaign
     async createCampaign(data) {
         return prisma_1.default.campaign.create({
             data,
@@ -24,6 +25,7 @@ class CampaignRepository {
             },
         });
     }
+    // Find campaign by slug
     async findCampaignBySlug(slug) {
         return prisma_1.default.campaign.findUnique({
             where: {
@@ -31,6 +33,7 @@ class CampaignRepository {
             },
         });
     }
+    // Find category by ID
     async findCategoryById(categoryId) {
         return prisma_1.default.category.findUnique({
             where: {
@@ -40,7 +43,7 @@ class CampaignRepository {
     }
     // Get all active campaigns
     async findAllCampaigns(options) {
-        const { skip, take, categoryId, search, isFeatured } = options;
+        const { skip, take, categoryId, search, isFeatured, } = options;
         return prisma_1.default.campaign.findMany({
             where: {
                 status: "ACTIVE",
@@ -88,7 +91,7 @@ class CampaignRepository {
             },
         });
     }
-    // Get one campaign using slug
+    // Get campaign details by slug
     async findCampaignDetailsBySlug(slug) {
         return prisma_1.default.campaign.findFirst({
             where: {
@@ -128,8 +131,9 @@ class CampaignRepository {
             },
         });
     }
+    // Count active campaigns
     async countCampaigns(options) {
-        const { categoryId, search, isFeatured } = options;
+        const { categoryId, search, isFeatured, } = options;
         return prisma_1.default.campaign.count({
             where: {
                 status: "ACTIVE",
@@ -159,6 +163,7 @@ class CampaignRepository {
             },
         });
     }
+    // Find campaign by ID
     async findCampaignById(id) {
         return prisma_1.default.campaign.findUnique({
             where: {
@@ -171,6 +176,7 @@ class CampaignRepository {
             },
         });
     }
+    // Approve campaign
     async approveCampaign(id, adminId) {
         return prisma_1.default.campaign.update({
             where: {
@@ -193,6 +199,7 @@ class CampaignRepository {
             },
         });
     }
+    // Reject campaign
     async rejectCampaign(id, adminId, rejectionReason) {
         return prisma_1.default.campaign.update({
             where: {
@@ -215,6 +222,7 @@ class CampaignRepository {
             },
         });
     }
+    // Update campaign
     async updateCampaign(id, data) {
         return prisma_1.default.campaign.update({
             where: {

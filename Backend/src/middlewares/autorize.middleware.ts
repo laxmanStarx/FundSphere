@@ -1,30 +1,24 @@
 import { Request, Response, NextFunction } from "express";
 import { Role } from "@prisma/client";
-
 import { AppError } from "../utils/AppError";
 import { HttpStatus } from "../constants/httpStatus";
 
-export const authorize =
-  (...roles: Role[]) =>
-  (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-
+export const authorize = (...allowedRoles: Role[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
       throw new AppError(
-        "Unauthorized",
+        "Authentication required",
         HttpStatus.UNAUTHORIZED
       );
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (!allowedRoles.includes(req.user.role)) {
       throw new AppError(
-        "Forbidden",
+        "You are not authorized to perform this action",
         HttpStatus.FORBIDDEN
       );
     }
 
     next();
   };
+};
