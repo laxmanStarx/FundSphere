@@ -170,7 +170,15 @@ class CampaignRepository {
                 id,
             },
             include: {
-                owner: true,
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                    },
+                },
                 category: true,
                 images: true,
             },
@@ -193,7 +201,15 @@ class CampaignRepository {
                 rejectionReason: null,
             },
             include: {
-                owner: true,
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                    },
+                },
                 category: true,
                 images: true,
             },
@@ -216,7 +232,15 @@ class CampaignRepository {
                 },
             },
             include: {
-                owner: true,
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                    },
+                },
                 category: true,
                 images: true,
             },
@@ -230,7 +254,15 @@ class CampaignRepository {
             },
             data,
             include: {
-                owner: true,
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                    },
+                },
                 category: true,
                 images: true,
             },

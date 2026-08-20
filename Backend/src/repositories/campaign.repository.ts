@@ -107,7 +107,6 @@ export class CampaignRepository {
         },
 
         category: true,
-
         images: true,
       },
     });
@@ -132,7 +131,6 @@ export class CampaignRepository {
         },
 
         category: true,
-
         images: true,
 
         donations: {
@@ -211,8 +209,18 @@ export class CampaignRepository {
       where: {
         id,
       },
+
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            bio: true,
+          },
+        },
+
         category: true,
         images: true,
       },
@@ -240,7 +248,16 @@ export class CampaignRepository {
       },
 
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            bio: true,
+          },
+        },
+
         category: true,
         images: true,
       },
@@ -271,7 +288,16 @@ export class CampaignRepository {
       },
 
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            bio: true,
+          },
+        },
+
         category: true,
         images: true,
       },
@@ -291,7 +317,16 @@ export class CampaignRepository {
       data,
 
       include: {
-        owner: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            bio: true,
+          },
+        },
+
         category: true,
         images: true,
       },
