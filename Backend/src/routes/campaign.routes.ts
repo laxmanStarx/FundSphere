@@ -63,7 +63,11 @@ router.put(
 
 
 
-
+router.delete(
+  "/:id",
+  authenticate,
+  campaignController.deleteCampaign
+);
 
 
 

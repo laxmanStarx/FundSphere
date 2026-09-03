@@ -268,5 +268,29 @@ class CampaignRepository {
             },
         });
     }
+    // Soft delete campaign
+    async deleteCampaign(id) {
+        return prisma_1.default.campaign.update({
+            where: {
+                id,
+            },
+            data: {
+                deletedAt: new Date(),
+            },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                    },
+                },
+                category: true,
+                images: true,
+            },
+        });
+    }
 }
 exports.CampaignRepository = CampaignRepository;

@@ -180,4 +180,34 @@ updateCampaign = asyncHandler(
 );
 
 
+
+
+
+
+
+
+deleteCampaign = asyncHandler(
+  async (req: Request, res: Response) => {
+
+    const campaignId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    const campaign =
+      await this.campaignService.deleteCampaign(
+        campaignId,
+        req.user!.id
+      );
+
+    return res.status(HttpStatus.OK).json(
+      new ApiResponse(
+        HttpStatus.OK,
+        campaign,
+        "Campaign deleted successfully"
+      )
+    );
+  }
+);
+
+
 }

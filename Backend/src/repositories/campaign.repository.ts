@@ -332,4 +332,33 @@ export class CampaignRepository {
       },
     });
   }
+
+  // Soft delete campaign
+async deleteCampaign(id: string) {
+  return prisma.campaign.update({
+    where: {
+      id,
+    },
+
+    data: {
+      deletedAt: new Date(),
+    },
+
+    include: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          avatar: true,
+          bio: true,
+        },
+      },
+
+      category: true,
+
+      images: true,
+    },
+  });
+}
 }

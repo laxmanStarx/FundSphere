@@ -79,6 +79,13 @@ class CampaignController {
             });
             return res.status(httpStatus_1.HttpStatus.OK).json(new apiResponse_1.ApiResponse(httpStatus_1.HttpStatus.OK, campaign, "Campaign updated successfully"));
         });
+        this.deleteCampaign = (0, asyncHandler_1.asyncHandler)(async (req, res) => {
+            const campaignId = Array.isArray(req.params.id)
+                ? req.params.id[0]
+                : req.params.id;
+            const campaign = await this.campaignService.deleteCampaign(campaignId, req.user.id);
+            return res.status(httpStatus_1.HttpStatus.OK).json(new apiResponse_1.ApiResponse(httpStatus_1.HttpStatus.OK, campaign, "Campaign deleted successfully"));
+        });
     }
 }
 exports.CampaignController = CampaignController;

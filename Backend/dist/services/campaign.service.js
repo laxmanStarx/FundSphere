@@ -266,5 +266,20 @@ class CampaignService {
         const updatedCampaign = await this.campaignRepository.updateCampaign(campaignId, updateData);
         return updatedCampaign;
     }
+    async deleteCampaign(campaignId, userId) {
+        const campaign = await this.campaignRepository.findCampaignById(campaignId);
+        if (!campaign) {
+            throw new AppError_1.AppError("Campaign not found", httpStatus_1.HttpStatus.NOT_FOUND);
+        }
+        if (campaign.deletedAt) {
+            throw new AppError_1.AppError("Campaign is already deleted", httpStatus_1.HttpStatus.BAD_REQUEST);
+        }
+        // Only campaign owner can delete
+        if (campaign.ownerId !== userId) {
+            throw new AppError_1.AppError("You are not allowed to delete this campaign", httpStatus_1.HttpStatus.FORBIDDEN);
+        }
+        const deletedCampaign = await this.campaignRepository.deleteCampaign(campaignId);
+        return deletedCampaign;
+    }
 }
 exports.CampaignService = CampaignService;
