@@ -23,16 +23,25 @@ export class AuthRepository {
 }
 
 
-    async createUser(data: {
-        name: string;
-        email: string;
-        password: string;
-    }) {
-        return prisma.user.create({
-            data,
-        })
-    }
+async createUser(data: {
+  name: string;
+  email: string;
+  password: string;
+}) {
+  return prisma.user.create({
+    data: {
+      ...data,
 
+      wallet: {
+        create: {},
+      },
+    },
+
+    include: {
+      wallet: true,
+    },
+  });
+}
 
     async findUserById(id: string)
     {
@@ -41,13 +50,13 @@ export class AuthRepository {
         });
     }
 
-    async createWallet(userId: string){
-        return prisma.wallet.create({
-            data: {
-                userId,
-            },
-        });
-    }
+    // async createWallet(userId: string){
+    //     return prisma.wallet.create({
+    //         data: {
+    //             userId,
+    //         },
+    //     });
+    // }
 
     async saveRefreshToken(
         token: string,
