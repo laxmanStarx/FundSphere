@@ -6,6 +6,7 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 
 
 import campaignRoutes from "./routes/campaign.routes";
+import walletRoutes from "./routes/wallet.routes";
 
 
 
@@ -23,7 +24,10 @@ app.use("/api/v1/auth", authRoutes)
 
 app.use("/api/v1/campaigns", campaignRoutes);
 
-
+app.use(
+  "/api/v1/wallet",
+  walletRoutes
+);
 
 
 app.use(errorMiddleware);
